@@ -29,7 +29,7 @@ app.get("/:id", auth("admin", "petugas", "masyarakat"), async (req, res) => {
         })
 })
 
-app.post("/register", auth("masyarakat"), async (req, res) => {
+app.post("/register", async (req, res) => {
     const data = {
         nama: req.body.nama,
         password: md5(req.body.password),
