@@ -14,7 +14,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import SellIcon from "@mui/icons-material/Sell";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 import { styled } from "@mui/styles";
 
 const DivStyle = styled("div")(({ theme }) => ({
@@ -49,18 +49,34 @@ class drawer extends React.Component {
         name: "Dashboard",
         url: "/dashboard",
       },
-      { icon: <Inventory2Icon />, name: "Barang", url: "/barang" },
-      { icon: <SellIcon />, name: "Lelang", url: "/lelang" },
-      { icon: <SupervisorAccountIcon />, name: "Petugas", url: "/petugas" },
-      { icon: <LogoutIcon />, name: "Logout", url: "/logout" }
+      {
+        icon: <Inventory2Icon sx={{ color: "#000000" }} />,
+        name: "Barang",
+        url: "/barang",
+      },
+      {
+        icon: <SellIcon sx={{ color: "#000000" }} />,
+        name: "Lelang",
+        url: "/lelang",
+      },
+      {
+        icon: <SupervisorAccountIcon sx={{ color: "#000000" }} />,
+        name: "Petugas",
+        url: "/petugas",
+      },
+      {
+        icon: <LogoutIcon sx={{ color: "#000000" }} />,
+        name: "Logout",
+        url: "/",
+      },
     ];
     return (
       <Drawer
         sx={{
-          width: "391px",
+          width: "250px",
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: "391px",
+            width: "250px",
             boxSizing: "border-box",
           },
         }}
@@ -90,7 +106,7 @@ class drawer extends React.Component {
                   {" "}
                   <Typography
                     sx={{
-                      fontSize: "18px",
+                      fontSize: "14px",
                       color: "#000000",
                       fontFamily: "poppins",
                     }}
