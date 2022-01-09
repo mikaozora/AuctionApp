@@ -43,23 +43,24 @@ const Login = (props) => {
     setSnack({ ...snack, open: false });
   };
 
-  const [alert, setAlert] = useState(false)
+  const [alert, setAlert] = useState(false);
 
   const processLogin = async (values) => {
     try {
       const response = await axios.post(`${url}/login`, values);
       console.log(response);
       if (!response.data.logged) {
-        setAlert(true)
-        return history.push("/");
+        setAlert(true);
+      } else if (response.data.logged) {
+        let user = response.data.data;
+        let token = response.data.token;
+        localStorage.setItem("userLogin", JSON.stringify(user));
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", response.data.data.level);
+        return history.push("/dashboard");
       }
-      let user = response.data.data;
-      let token = response.data.token;
-      localStorage.setItem("userLogin", JSON.stringify(user));
-      localStorage.setItem("token", token);
-      return history.push("/dashboard");
-    } catch(err) {
-        console.log(err);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -157,15 +158,17 @@ const Login = (props) => {
           >
             Login
           </Button>
-          {alert === true ? (<Snackbar
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            open={open}
-            onClose={handleClose}
-            message="Invalid Username or Password"
-            key={vertical + horizontal}
-            autoHideDuration={6000}
-          />) : null}
-          
+          {alert === true ? (
+            <Snackbar
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              open={open}
+              onClose={handleClose}
+              message="Invalid Username or Password"
+              key={vertical + horizontal}
+              autoHideDuration={6000}
+            />
+          ) : null}
+
           <div
             style={{
               display: "flex",

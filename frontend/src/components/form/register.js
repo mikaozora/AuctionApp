@@ -53,7 +53,6 @@ const Register = (props) => {
   const processRegister = async (values, resetForm) => {
     try {
       const response = await axios.post(`${url}/masyarakat/register`, values);
-      console.log("response");
       if (response) {
         setAlert(true);
         resetForm();
