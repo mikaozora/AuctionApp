@@ -77,7 +77,7 @@ const Login = (props) => {
     validationSchema: validation,
     onSubmit: (values) => {
       processLogin(values);
-      console.log(values);
+      // console.log(values);
     },
   });
   return (
@@ -121,7 +121,7 @@ const Login = (props) => {
           <InputStyle
             name="username"
             onChange={formik.handleChange}
-            values={formik.values.username}
+            value={formik.values.username}
             autoComplete="off"
           />
           <Typography
@@ -138,7 +138,7 @@ const Login = (props) => {
             type="password"
             name="password"
             onChange={formik.handleChange}
-            values={formik.values.password}
+            value={formik.values.password}
             autoComplete="off"
           />
           <Button

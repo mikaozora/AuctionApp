@@ -17,7 +17,7 @@ module.exports = {
                 },
             },
             tglLelang: {
-                type: Sequelize.DATE,
+                type: Sequelize.STRING,
                 allowNull:true
             },
             hargaAkhir: {

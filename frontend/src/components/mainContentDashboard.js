@@ -3,6 +3,7 @@ import { Box, Container } from "@mui/material";
 import CardStyle from '../components/dashboard/card'
 
 class mainContentDashboard extends React.Component {
+
   render() {
     return (
       <main
@@ -29,7 +30,7 @@ class mainContentDashboard extends React.Component {
               fontFamily: "poppins",
             }}
           >
-            Welcome Mika Ozora
+            Welcome {JSON.parse(localStorage.getItem("userLogin")).nama}
           </h1>
           <CardStyle />
         </div>

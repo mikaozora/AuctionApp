@@ -17,14 +17,14 @@ import InfoIcon from "@mui/icons-material/Info";
 import axios from "axios";
 import { url } from "../../config";
 import { DialogDelete, DialogEdit } from "./dialog";
-import ChipStatus from './chip'
-import { convertToRupiah } from "../../helper/convertRupiah";
 
 const TableBarang = (props) => {
   const [data, setData] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [itemSelected, setItemSelected] = useState("");
+  const [nameBarang, setNameBarang] = useState("")
+
   const handleClickOpenDelete = () => {
     setOpenDelete(true);
   };
@@ -42,20 +42,12 @@ const TableBarang = (props) => {
   const handleEditData = (payload) => {
     setOpenEdit(true);
     setItemSelected(payload);
+    setNameBarang(payload.barang.nama)
   };
   const headerConfig = () => {
     let header = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    };
-    return header;
-  };
-  const headerConfigFile = () => {
-    let header = {
-      headers: {
-        "Content-Type": "multipart/formdata",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     };
@@ -68,7 +60,7 @@ const TableBarang = (props) => {
     horizpntal: "center",
   });
   const getData = async () => {
-    const response = await axios.get(`${url}/barang`, headerConfig());
+    const response = await axios.get(`${url}/lelang`, headerConfig());
     if (!response) {
       console.log("error");
     }
@@ -77,8 +69,8 @@ const TableBarang = (props) => {
 
   const deleteData = async () => {
     const response = await axios.delete(
-      `${url}/barang/${itemSelected}`,
-      headerConfigFile()
+      `${url}/lelang/${itemSelected}`,
+      headerConfig()
     );
     if (!response) {
       console.log("error");
@@ -90,18 +82,21 @@ const TableBarang = (props) => {
   };
   const editData = async (payload) => {
     try {
+      const newValues = {
+        ...payload,
+        endTime: payload.endTime + ".000Z",
+      };
       const response = await axios.put(
-        `${url}/barang/`,
-        payload,
-        headerConfigFile()
+        `${url}/lelang/`,
+        newValues,
+        headerConfig()
       );
-      console.log(response);
       if (response.data.code === 200 || response.data.code === 201) {
         setItemSelected("");
         handleCloseEdit();
         setAlert({
           open: true,
-          message: "Berhasil Mengubah Data Barang",
+          message: "Berhasil Mengubah Data Petugas",
         });
         getData();
       }
@@ -113,7 +108,7 @@ const TableBarang = (props) => {
     getData();
   }, [props.reload]);
   return (
-    <TableContainer component={Paper} >
+    <TableContainer component={Paper}>
       <DialogDelete
         open={openDelete}
         closeDialog={() => handleCloseDelete()}
@@ -124,14 +119,16 @@ const TableBarang = (props) => {
         closeDialog={() => handleCloseEdit()}
         processEdit={(payload) => editData(payload)}
         data={itemSelected}
-      />
+        nama={nameBarang}
+      /> 
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead >
-          <TableRow >
+        <TableHead>
+          <TableRow>
             <TableCell>No</TableCell>
-            <TableCell>Nama</TableCell>
-            <TableCell>Harga Awal</TableCell>
-            <TableCell>Tanggal</TableCell>
+            <TableCell align="center">Nama Barang</TableCell>
+            <TableCell align="center">Harga Akhir</TableCell>
+            <TableCell align="center">Tanggal Lelang</TableCell>
+            <TableCell align="center">Tanggal Berakhir</TableCell>
             <TableCell align="center">Status</TableCell>
             <TableCell align="center">Action</TableCell>
           </TableRow>
@@ -147,13 +144,23 @@ const TableBarang = (props) => {
                 },
               }}
             >
-              {/* {console.log(row)} */}
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{row.nama}</TableCell>
-              <TableCell>{convertToRupiah(row.hargaAwal)}</TableCell>
-              <TableCell>{row.tgl}</TableCell>
+              <TableCell align="center">{row.barang.nama}</TableCell>
+              <TableCell align="center">{row.hargaAkhir}</TableCell>
+              <TableCell align="center">{row.tglLelang}</TableCell>
+              <TableCell align="center">{row.endTime ? row.endTime : "-"}</TableCell>
               <TableCell align="center">
-                <ChipStatus data={row} />
+                {row.status === "Dibuka" ? (
+                  <Chip
+                    label="Dibuka"
+                    sx={{ backgroundColor: "#E8E1D9", borderRadius: "10px" }}
+                  />
+                ) : (
+                  (<Chip
+                    label="Ditutup"
+                    sx={{ backgroundColor: "#F4A442", borderRadius: "10px", color:"#ffffff" }}
+                  />)
+                )}
               </TableCell>
               <TableCell align="center">
                 <IconButton
@@ -175,15 +182,6 @@ const TableBarang = (props) => {
                   }}
                 >
                   <DeleteIcon sx={{ fontSize: "20px", color: "#ff0005" }} />
-                </IconButton>
-                <IconButton
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(54, 103, 201, 0.15)",
-                    },
-                  }}
-                >
-                  <InfoIcon sx={{ fontSize: "20px", color: "#3667c9" }} />
                 </IconButton>
               </TableCell>
             </TableRow>

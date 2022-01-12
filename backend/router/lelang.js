@@ -11,7 +11,9 @@ const { history_lelang } = require('../models/index')
 const { runTime } = require('../helper/endTime')
 
 app.get("/", auth("admin", "petugas", "masyarakat"), async (req, res) => {
-    await lelang.findAll()
+    await lelang.findAll({
+        include:["barang"]
+    })
         .then(result => {
             return response(res, 'success', result, 'Success get data lelang', 200)
         })
@@ -23,6 +25,19 @@ app.get("/", auth("admin", "petugas", "masyarakat"), async (req, res) => {
 app.get("/:id", auth("admin", "petugas", "masyarakat"), async (req, res) => {
     const param = {
         id: req.params.id
+    }
+    await lelang.findOne({ where: param })
+        .then(result => {
+            return response(res, 'success', result, 'Success get data lelang', 200)
+        }).catch(err => {
+            return response(res, 'fail', err, 'Failed get data lelang', 400)
+        })
+})
+
+//get status
+app.get("/barang/:id", auth("admin", "petugas", "masyarakat"), async (req, res) => {
+    const param = {
+        idBarang: req.params.id
     }
     await lelang.findOne({ where: param })
         .then(result => {
@@ -49,6 +64,7 @@ app.post("/", auth("admin", "petugas"),async (req, res) => {
         let end = new Date(req.body.endTime)
         let timeStamp = end.getTime()
         data.endTime = end
+        console.log(data);
         await lelang.create(data)
             .then(result => {
                 runTime('* * * * * *', timeStamp, result.dataValues.id)
@@ -97,7 +113,7 @@ app.put("/", auth("admin", "petugas"), async (req, res) => {
                 return response(res, 'fail', err, 'Failed update data lelang', 400)
             })
     } else {
-        await lelang.create(data)
+        await lelang.update(data, {where:param})
             .then(result => {
                 return response(res, 'success', result, 'Success create data lelang', 201)
             })

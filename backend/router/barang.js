@@ -53,6 +53,7 @@ app.post("/", upload.single("image"), auth("admin", "petugas"),async (req, res) 
             tgl: toIsoString(date),
             image: req.file.filename
         }
+        console.log(data);
         await barang.create(data)
             .then(result => {
                 return response(res, 'success', result, 'Success create data barang', 200)
@@ -60,6 +61,7 @@ app.post("/", upload.single("image"), auth("admin", "petugas"),async (req, res) 
                 return response(res, 'fail', err, 'Failed create data barang', 400)
             })
     }
+    
 })
 
 app.put("/", upload.single("image"), auth("admin", "petugas"), async (req, res) => {
