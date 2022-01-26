@@ -16,6 +16,7 @@ import SellIcon from "@mui/icons-material/Sell";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { styled } from "@mui/styles";
+import logo from "../assets/logo.svg";
 
 const DivStyle = styled("div")(({ theme }) => ({
   width: "322px",
@@ -36,13 +37,13 @@ const DivStyleActive = styled("div")(({ theme }) => ({
   width: "322px",
   height: "49px",
   display: "flex",
-  backgroundColor: "#f7f7f7",
+  backgroundColor: "#FBFFFB",
   borderRadius: "10px",
   alignItems: "center",
   marginBottom: "16px",
   paddingLeft: "20px",
   cursor: "pointer",
-  fontSize: "18px"
+  fontSize: "18px",
 }));
 
 class drawer extends React.Component {
@@ -55,13 +56,13 @@ class drawer extends React.Component {
     }
   };
   handleLogout = () => {
-    localStorage.removeItem("userLogin")
-    localStorage.removeItem("token")
-    localStorage.removeItem("role")
-    return this.props.history.push("/")
-  }
+    localStorage.removeItem("userLogin");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    return this.props.history.push("/");
+  };
   render() {
-    const currentPath = this.props.history.location.pathname
+    const currentPath = this.props.history.location.pathname;
     return (
       <Drawer
         sx={{
@@ -75,7 +76,7 @@ class drawer extends React.Component {
         variant="permanent"
         anchor="left"
       >
-        <h1
+        {/* <h1
           style={{
             color: "#125C13",
             fontFamily: "poppins",
@@ -84,172 +85,52 @@ class drawer extends React.Component {
           }}
         >
           LELANG
-        </h1>
+        </h1> */}
+        <img
+          src={logo}
+          style={{
+            width: "150px",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px 20px",
+            marginLeft: "24px",
+            marginTop: "24px"
+          }}
+        />
         <List>
-          {currentPath === "/dashboard" ? <ListItem
-              key="Dashboard"
-              onClick={() => this.handleSideBar("/dashboard")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyleActive>
-                <ListItemIcon><HomeIcon sx={{ color: "#3E7C17" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#3E7C17",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Dashboard
-                  </Typography>
-                </ListItemText>
-              </DivStyleActive>
-            </ListItem> : <ListItem
-              key="Dashboard"
-              onClick={() => this.handleSideBar("/dashboard")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyle>
-                <ListItemIcon><HomeIcon sx={{ color: "#000000" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#000000",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Dashboard
-                  </Typography>
-                </ListItemText>
-              </DivStyle>
-            </ListItem>}
-            {currentPath === "/barang" ? <ListItem
-              key="Barang"
-              onClick={() => this.handleSideBar("/barang")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyleActive>
-                <ListItemIcon><Inventory2Icon sx={{ color: "#3E7C17" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#3E7C17",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Barang
-                  </Typography>
-                </ListItemText>
-              </DivStyleActive>
-            </ListItem> : <ListItem
-              key="Barang"
-              onClick={() => this.handleSideBar("/barang")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyle>
-                <ListItemIcon><Inventory2Icon sx={{ color: "#000000" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#000000",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Barang
-                  </Typography>
-                </ListItemText>
-              </DivStyle>
-            </ListItem>}
-            {currentPath === "/lelang" ? <ListItem
-              key="Lelang"
-              onClick={() => this.handleSideBar("/lelang")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyleActive>
-                <ListItemIcon><SellIcon sx={{ color: "#3E7C17" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#3E7C17",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Lelang
-                  </Typography>
-                </ListItemText>
-              </DivStyleActive>
-            </ListItem> : <ListItem
-              key="Lelang"
-              onClick={() => this.handleSideBar("/lelang")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyle>
-                <ListItemIcon><SellIcon sx={{ color: "#000000" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#000000",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Lelang
-                  </Typography>
-                </ListItemText>
-              </DivStyle>
-            </ListItem>}
-            {currentPath === "/petugas" ? <ListItem
-              key="Petugas"
-              onClick={() => this.handleSideBar("/petugas")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyleActive>
-                <ListItemIcon><SupervisorAccountIcon sx={{ color: "#3E7C17" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#3E7C17",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Petugas
-                  </Typography>
-                </ListItemText>
-              </DivStyleActive>
-            </ListItem> : <ListItem
-              key="Petugas"
-              onClick={() => this.handleSideBar("/petugas")}
-              sx={{ backgroundColor: "#ffffff" }}
-            >
-              <DivStyle>
-                <ListItemIcon><SupervisorAccountIcon sx={{ color: "#000000" }} /></ListItemIcon>
-                <ListItemText>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      color: "#000000",
-                      fontFamily: "poppins",
-                    }}
-                  >
-                    Petugas
-                  </Typography>
-                </ListItemText>
-              </DivStyle>
-            </ListItem>}
-            
+          {currentPath === "/dashboard" ? (
             <ListItem
-              key="Logout"
-              onClick={() => this.handleLogout()}
+              key="Dashboard"
+              onClick={() => this.handleSideBar("/dashboard")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyleActive>
+                <ListItemIcon>
+                  <HomeIcon sx={{ color: "#03AC0E" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#03AC0E",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Dashboard
+                  </Typography>
+                </ListItemText>
+              </DivStyleActive>
+            </ListItem>
+          ) : (
+            <ListItem
+              key="Dashboard"
+              onClick={() => this.handleSideBar("/dashboard")}
               sx={{ backgroundColor: "#ffffff" }}
             >
               <DivStyle>
-                <ListItemIcon><LogoutIcon sx={{ color: "#000000" }} /></ListItemIcon>
+                <ListItemIcon>
+                  <HomeIcon sx={{ color: "#000000" }} />
+                </ListItemIcon>
                 <ListItemText>
                   <Typography
                     sx={{
@@ -258,11 +139,176 @@ class drawer extends React.Component {
                       fontFamily: "poppins",
                     }}
                   >
-                    Logout
+                    Dashboard
                   </Typography>
                 </ListItemText>
               </DivStyle>
             </ListItem>
+          )}
+          {currentPath === "/barang" ? (
+            <ListItem
+              key="Barang"
+              onClick={() => this.handleSideBar("/barang")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyleActive>
+                <ListItemIcon>
+                  <Inventory2Icon sx={{ color: "#03AC0E" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#03AC0E",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Barang
+                  </Typography>
+                </ListItemText>
+              </DivStyleActive>
+            </ListItem>
+          ) : (
+            <ListItem
+              key="Barang"
+              onClick={() => this.handleSideBar("/barang")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyle>
+                <ListItemIcon>
+                  <Inventory2Icon sx={{ color: "#000000" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#000000",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Barang
+                  </Typography>
+                </ListItemText>
+              </DivStyle>
+            </ListItem>
+          )}
+          {currentPath === "/lelang" ? (
+            <ListItem
+              key="Lelang"
+              onClick={() => this.handleSideBar("/lelang")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyleActive>
+                <ListItemIcon>
+                  <SellIcon sx={{ color: "#03AC0E" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#03AC0E",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Lelang
+                  </Typography>
+                </ListItemText>
+              </DivStyleActive>
+            </ListItem>
+          ) : (
+            <ListItem
+              key="Lelang"
+              onClick={() => this.handleSideBar("/lelang")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyle>
+                <ListItemIcon>
+                  <SellIcon sx={{ color: "#000000" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#000000",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Lelang
+                  </Typography>
+                </ListItemText>
+              </DivStyle>
+            </ListItem>
+          )}
+          {currentPath === "/petugas" ? (
+            <ListItem
+              key="Petugas"
+              onClick={() => this.handleSideBar("/petugas")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyleActive>
+                <ListItemIcon>
+                  <SupervisorAccountIcon sx={{ color: "#03AC0E" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#03AC0E",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Petugas
+                  </Typography>
+                </ListItemText>
+              </DivStyleActive>
+            </ListItem>
+          ) : (
+            <ListItem
+              key="Petugas"
+              onClick={() => this.handleSideBar("/petugas")}
+              sx={{ backgroundColor: "#ffffff" }}
+            >
+              <DivStyle>
+                <ListItemIcon>
+                  <SupervisorAccountIcon sx={{ color: "#000000" }} />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "#000000",
+                      fontFamily: "poppins",
+                    }}
+                  >
+                    Petugas
+                  </Typography>
+                </ListItemText>
+              </DivStyle>
+            </ListItem>
+          )}
+
+          <ListItem
+            key="Logout"
+            onClick={() => this.handleLogout()}
+            sx={{ backgroundColor: "#ffffff", mt:25 }}
+          >
+            <DivStyle style={{marginBottom:0}}>
+              <ListItemIcon>
+                <LogoutIcon sx={{ color: "#000000" }} />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    color: "#000000",
+                    fontFamily: "poppins",
+                  }}
+                >
+                  Logout
+                </Typography>
+              </ListItemText>
+            </DivStyle>
+          </ListItem>
         </List>
       </Drawer>
     );

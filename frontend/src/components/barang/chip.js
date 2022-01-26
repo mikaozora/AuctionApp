@@ -39,12 +39,12 @@ const ChipStatus = (props) => {
       {!status ? (
         <Chip
           label="Tidak Dilelang"
-          sx={{ backgroundColor: "#E8E1D9", borderRadius: "10px" }}
+          sx={{ backgroundColor: "#FFEAEF", borderRadius: "8px", width: "125px", color: "#FF5C86", fontFamily: 'poppins', fontWeight: 500 }}
         />
       ) : (
         <Chip
           label="Dilelang"
-          sx={{ backgroundColor: "#F4A442", borderRadius: "10px", color:"#ffffff" }}
+          sx={{ backgroundColor: "#FBFFFB", borderRadius: "8px", width: "125px", color:"#03AC0E", fontFamily: 'poppins', fontWeight: 500 }}
         />
       )}
     </div>

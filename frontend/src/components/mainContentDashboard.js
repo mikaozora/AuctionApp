@@ -8,7 +8,7 @@ class mainContentDashboard extends React.Component {
     return (
       <main
         style={{
-          background: "#f7f7f7f7",
+          background: "#F7f7f7",
           minHeight: "100vh",
           flexGrow: 1,
           overflow: "auto",
@@ -25,9 +25,11 @@ class mainContentDashboard extends React.Component {
         >
           <h1
             style={{
-              marginLeft: "28px",
+              marginLeft: "32px",
               marginTop: "24px",
+              marginBottom: "32px",
               fontFamily: "poppins",
+              fontWeight: 600,
             }}
           >
             Welcome {JSON.parse(localStorage.getItem("userLogin")).nama}

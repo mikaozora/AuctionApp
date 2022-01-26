@@ -17,13 +17,15 @@ import InfoIcon from "@mui/icons-material/Info";
 import axios from "axios";
 import { url } from "../../config";
 import { DialogDelete, DialogEdit } from "./dialog";
+import { tableCellClasses } from "@mui/material/TableCell";
+import { convertToRupiah } from "../../helper/convertRupiah";
 
 const TableBarang = (props) => {
   const [data, setData] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [itemSelected, setItemSelected] = useState("");
-  const [nameBarang, setNameBarang] = useState("")
+  const [nameBarang, setNameBarang] = useState("");
 
   const handleClickOpenDelete = () => {
     setOpenDelete(true);
@@ -42,7 +44,7 @@ const TableBarang = (props) => {
   const handleEditData = (payload) => {
     setOpenEdit(true);
     setItemSelected(payload);
-    setNameBarang(payload.barang.nama)
+    setNameBarang(payload.barang.nama);
   };
   const headerConfig = () => {
     let header = {
@@ -108,87 +110,114 @@ const TableBarang = (props) => {
     getData();
   }, [props.reload]);
   return (
-    <TableContainer component={Paper}>
-      <DialogDelete
-        open={openDelete}
-        closeDialog={() => handleCloseDelete()}
-        processDelete={() => deleteData()}
-      />
-      <DialogEdit
-        open={openEdit}
-        closeDialog={() => handleCloseEdit()}
-        processEdit={(payload) => editData(payload)}
-        data={itemSelected}
-        nama={nameBarang}
-      /> 
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>No</TableCell>
-            <TableCell align="center">Nama Barang</TableCell>
-            <TableCell align="center">Harga Akhir</TableCell>
-            <TableCell align="center">Tanggal Lelang</TableCell>
-            <TableCell align="center">Tanggal Berakhir</TableCell>
-            <TableCell align="center">Status</TableCell>
-            <TableCell align="center">Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((row, index) => (
-            <TableRow
-              key={index}
-              sx={{
-                "&:last-child td, &:last-child th": { border: 0 },
-                "&:nth-of-type(odd)": {
-                  backgroundColor: "#f7f7f7",
-                },
-              }}
-            >
-              <TableCell>{index + 1}</TableCell>
-              <TableCell align="center">{row.barang.nama}</TableCell>
-              <TableCell align="center">{row.hargaAkhir}</TableCell>
-              <TableCell align="center">{row.tglLelang}</TableCell>
-              <TableCell align="center">{row.endTime ? row.endTime : "-"}</TableCell>
-              <TableCell align="center">
-                {row.status === "Dibuka" ? (
-                  <Chip
-                    label="Dibuka"
-                    sx={{ backgroundColor: "#E8E1D9", borderRadius: "10px" }}
-                  />
-                ) : (
-                  (<Chip
-                    label="Ditutup"
-                    sx={{ backgroundColor: "#F4A442", borderRadius: "10px", color:"#ffffff" }}
-                  />)
-                )}
-              </TableCell>
-              <TableCell align="center">
-                <IconButton
-                  onClick={() => handleEditData(row)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(244, 164, 67, 0.17)",
-                    },
-                  }}
-                >
-                  <EditIcon sx={{ fontSize: "20px", color: "#F4A442" }} />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleDeleteData(row.id)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(255, 0, 4, 0.15)",
-                    },
-                  }}
-                >
-                  <DeleteIcon sx={{ fontSize: "20px", color: "#ff0005" }} />
-                </IconButton>
-              </TableCell>
+    <Paper sx={{ boxShadow: "none", padding: 3, borderRadius: 1 }}>
+      <TableContainer>
+        <DialogDelete
+          open={openDelete}
+          closeDialog={() => handleCloseDelete()}
+          processDelete={() => deleteData()}
+        />
+        <DialogEdit
+          open={openEdit}
+          closeDialog={() => handleCloseEdit()}
+          processEdit={(payload) => editData(payload)}
+          data={itemSelected}
+          nama={nameBarang}
+        />
+        <Table
+          sx={{
+            minWidth: 650,
+            boxShadow: "none",
+            [`& .${tableCellClasses.root}`]: {
+              borderBottom: "none",
+              fontFamily: "poppins",
+            },
+          }}
+          aria-label="simple table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell>No</TableCell>
+              <TableCell align="left">Nama Barang</TableCell>
+              <TableCell align="left">Harga Akhir</TableCell>
+              <TableCell align="left">Tanggal Lelang</TableCell>
+              <TableCell align="left">Tanggal Berakhir</TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Action</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {data.map((row, index) => (
+              <TableRow
+                key={index}
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
+                  "&:nth-of-type(odd)": {
+                    backgroundColor: "#f7f7f7",
+                  },
+                }}
+              >
+                <TableCell>{index + 1}</TableCell>
+                <TableCell align="left">{row.barang.nama}</TableCell>
+                <TableCell align="left">{convertToRupiah(row.hargaAkhir)}</TableCell>
+                <TableCell align="left">{row.tglLelang}</TableCell>
+                <TableCell align="left">
+                  {row.endTime ? row.endTime : "-"}
+                </TableCell>
+                <TableCell align="center">
+                  {row.status === "Dibuka" ? (
+                    <Chip
+                      label="Dibuka"
+                      sx={{
+                        backgroundColor: "#FBFFFB",
+                        borderRadius: "8px",
+                        width: "80px",
+                        color: "#03AC0E",
+                        fontFamily: "poppins",
+                        fontWeight: 500,
+                      }}
+                    />
+                  ) : (
+                    <Chip
+                      label="Ditutup"
+                      sx={{
+                        backgroundColor: "#FFEAEF",
+                        borderRadius: "8px",
+                        width: "80px",
+                        color: "#FF5C86",
+                        fontFamily: "poppins",
+                        fontWeight: 500,
+                      }}
+                    />
+                  )}
+                </TableCell>
+                <TableCell align="center">
+                  <IconButton
+                    onClick={() => handleEditData(row)}
+                    sx={{
+                      backgroundColor: "#FAFFFA",
+                      borderRadius: "8px",
+                      marginRight: 1,
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleDeleteData(row.id)}
+                    sx={{
+                      backgroundColor: "#FAFFFA",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <DeleteIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 };
 

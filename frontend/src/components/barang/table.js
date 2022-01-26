@@ -10,15 +10,16 @@ import {
   IconButton,
   Chip,
 } from "@mui/material";
-import { styled } from "@mui/styles";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import InfoIcon from "@mui/icons-material/Info";
+import { styled, makeStyles } from "@mui/styles";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import axios from "axios";
 import { url } from "../../config";
 import { DialogDelete, DialogEdit } from "./dialog";
-import ChipStatus from './chip'
+import ChipStatus from "./chip";
 import { convertToRupiah } from "../../helper/convertRupiah";
+import { tableCellClasses } from "@mui/material/TableCell";
 
 const TableBarang = (props) => {
   const [data, setData] = useState([]);
@@ -113,84 +114,105 @@ const TableBarang = (props) => {
     getData();
   }, [props.reload]);
   return (
-    <TableContainer component={Paper} >
-      <DialogDelete
-        open={openDelete}
-        closeDialog={() => handleCloseDelete()}
-        processDelete={() => deleteData()}
-      />
-      <DialogEdit
-        open={openEdit}
-        closeDialog={() => handleCloseEdit()}
-        processEdit={(payload) => editData(payload)}
-        data={itemSelected}
-      />
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead >
-          <TableRow >
-            <TableCell>No</TableCell>
-            <TableCell>Nama</TableCell>
-            <TableCell>Harga Awal</TableCell>
-            <TableCell>Tanggal</TableCell>
-            <TableCell align="center">Status</TableCell>
-            <TableCell align="center">Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((row, index) => (
-            <TableRow
-              key={index}
-              sx={{
-                "&:last-child td, &:last-child th": { border: 0 },
-                "&:nth-of-type(odd)": {
-                  backgroundColor: "#f7f7f7",
-                },
-              }}
-            >
-              {/* {console.log(row)} */}
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{row.nama}</TableCell>
-              <TableCell>{convertToRupiah(row.hargaAwal)}</TableCell>
-              <TableCell>{row.tgl}</TableCell>
-              <TableCell align="center">
-                <ChipStatus data={row} />
-              </TableCell>
-              <TableCell align="center">
-                <IconButton
-                  onClick={() => handleEditData(row)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(244, 164, 67, 0.17)",
-                    },
-                  }}
-                >
-                  <EditIcon sx={{ fontSize: "20px", color: "#F4A442" }} />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleDeleteData(row.id)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(255, 0, 4, 0.15)",
-                    },
-                  }}
-                >
-                  <DeleteIcon sx={{ fontSize: "20px", color: "#ff0005" }} />
-                </IconButton>
-                <IconButton
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(54, 103, 201, 0.15)",
-                    },
-                  }}
-                >
-                  <InfoIcon sx={{ fontSize: "20px", color: "#3667c9" }} />
-                </IconButton>
-              </TableCell>
+    <Paper sx={{ boxShadow: "none", padding: 3, borderRadius: 1 }}>
+      <TableContainer>
+        <DialogDelete
+          open={openDelete}
+          closeDialog={() => handleCloseDelete()}
+          processDelete={() => deleteData()}
+        />
+        <DialogEdit
+          open={openEdit}
+          closeDialog={() => handleCloseEdit()}
+          processEdit={(payload) => editData(payload)}
+          data={itemSelected}
+        />
+        <Table
+          sx={{
+            minWidth: 650,
+            boxShadow: "none",
+            [`& .${tableCellClasses.root}`]: {
+              borderBottom: "none",
+              fontFamily: "poppins",
+            },
+          }}
+          aria-label="simple table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell align="left">No</TableCell>
+              <TableCell align="left">Nama</TableCell>
+              <TableCell align="left">Harga Awal</TableCell>
+              <TableCell align="left">Tanggal</TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Action</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody sx={{}}>
+            {data.map((row, index) => (
+              <TableRow
+                key={index}
+                sx={{
+                  "&:last-child td, &:last-child th": { border: "none" },
+                  "&:nth-of-type(odd)": {
+                    backgroundColor: "#f7f7f7",
+                  },
+                }}
+              >
+                {/* {console.log(row)} */}
+                <TableCell align="left">{index + 1}</TableCell>
+                <TableCell align="left" sx={{ maxWidth: "200px" }}>
+                  {row.nama}
+                </TableCell>
+                <TableCell align="left" sx={{ maxWidth: "100px" }}>
+                  {convertToRupiah(row.hargaAwal)}
+                </TableCell>
+                <TableCell align="left">{row.tgl}</TableCell>
+                <TableCell align="center">
+                  <ChipStatus data={row} />
+                </TableCell>
+                <TableCell align="center">
+                  <IconButton
+                    onClick={() => handleEditData(row)}
+                    sx={{
+                      backgroundColor: "#FAFFFA",
+                      borderRadius: "8px",
+                      marginRight: 1,
+                    }}
+                  >
+                    <EditRoundedIcon
+                      sx={{ fontSize: "16px", color: "#03AC0E" }}
+                    />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleDeleteData(row.id)}
+                    sx={{
+                      backgroundColor: "#FAFFFA",
+                      borderRadius: "8px",
+                      marginRight: 1,
+                    }}
+                  >
+                    <DeleteRoundedIcon
+                      sx={{ fontSize: "16px", color: "#03AC0E" }}
+                    />
+                  </IconButton>
+                  <IconButton
+                    sx={{
+                      backgroundColor: "#FAFFFA",
+                      borderRadius: "8px"
+                    }}
+                  >
+                    <InfoRoundedIcon
+                      sx={{ fontSize: "16px", color: "#03AC0E" }}
+                    />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 };
 

@@ -27,10 +27,10 @@ const FilterButton = () => {
           marginLeft: 1,
         }}
       >
-        <FilterListIcon sx={{ color: "#3E7C17" }} />
+        <FilterListIcon sx={{ color: "#03AC0E" }} />
         <Typography
           sx={{
-            color: "#3E7C17",
+            color: "#03AC0E",
             textTransform: "none",
             fontFamily: "poppins",
             fontSize: "16px",

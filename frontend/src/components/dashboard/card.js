@@ -14,49 +14,49 @@ const CardStyle = (props) => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     };
-    return header
+    return header;
   };
-  const getBarang = async() => {
-    try{
-      const response = await axios.get(`${url}/barang`, headerConfig())
-      if(!response){
+  const getBarang = async () => {
+    try {
+      const response = await axios.get(`${url}/barang`, headerConfig());
+      if (!response) {
         console.log("error");
       }
-      setBarangCount(response.data.data.length)
-    }catch(err){
+      setBarangCount(response.data.data.length);
+    } catch (err) {
       console.log(err);
     }
-  }
-  const getPetugas = async() => {
-    try{
-      const response = await axios.get(`${url}/petugas`, headerConfig())
-      if(!response){
+  };
+  const getPetugas = async () => {
+    try {
+      const response = await axios.get(`${url}/petugas`, headerConfig());
+      if (!response) {
         console.log("error");
       }
-      setPetugasCount(response.data.data.length)
-    }catch(err){
+      setPetugasCount(response.data.data.length);
+    } catch (err) {
       console.log(err);
     }
-  }
-  const getLelang = async() => {
-    try{
-      const response = await axios.get(`${url}/lelang`, headerConfig())
-      if(!response){
+  };
+  const getLelang = async () => {
+    try {
+      const response = await axios.get(`${url}/lelang`, headerConfig());
+      if (!response) {
         console.log("error");
       }
-      setLelangCount(response.data.data.length)
-    }catch(err){
+      setLelangCount(response.data.data.length);
+    } catch (err) {
       console.log(err);
     }
-  }
+  };
   const [spacing, setSpacing] = React.useState(4);
   useEffect(() => {
-    getBarang()
-    getPetugas()
-    getLelang()
-  }, [props.reload])
+    getBarang();
+    getPetugas();
+    getLelang();
+  }, [props.reload]);
   return (
-    <Grid sx={{ flexGrow: 1 }} container spacing={4}>
+    <Grid sx={{ flexGrow: 1 }} container>
       <Grid item xs={12}>
         <Grid
           container
@@ -67,82 +67,104 @@ const CardStyle = (props) => {
           <Grid item>
             <div
               style={{
-                height: 125,
-                width: 325,
+                minHeight: 125,
+                minWidth: 225,
                 maxWidth: "100%",
                 borderRadius: "10px",
-                backgroundColor: "#3E7C17",
-                padding: "16px",
+                backgroundColor: "#E6FFE8",
+                padding: "32px 32px 32px 32px",
               }}
             >
               <Typography
                 sx={{
-                  color: "#ffffff",
+                  color: "#000000",
                   fontFamily: "poppins",
                   fontSize: "20px",
                   fontWeight: "600",
-                  margin: "10px 0px 10px 10px",
+                  marginBottom: 1,
                 }}
               >
-                Jumlah Barang
+                Barang
               </Typography>
               <Typography
                 sx={{
-                  color: "#ffffff",
-                  fontSize: "28px",
+                  color: "#000000",
+                  fontSize: "40px",
                   fontWeight: 600,
                   fontFamily: "poppins",
-                  ml: 1,
+                  marginBottom: 1,
                 }}
               >
                 {barangCount}
               </Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  fontFamily: "poppins",
+                  width: "220px",
+                }}
+              >
+                Banyak data barang yang telah ditambahkan
+              </Typography>
             </div>
           </Grid>
           <Grid item>
             <div
               style={{
-                height: 125,
-                width: 325,
+                minHeight: 125,
+                minWidth: 225,
                 maxWidth: "100%",
                 borderRadius: "10px",
-                backgroundColor: "#F4A442",
-                padding: "16px",
+                backgroundColor: "#FFEAEF",
+                padding: "32px 32px 32px 32px",
               }}
             >
               <Typography
                 sx={{
-                  color: "#ffffff",
+                  color: "#000000",
                   fontFamily: "poppins",
                   fontSize: "20px",
                   fontWeight: "600",
-                  margin: "10px 0px 10px 10px",
+                  marginBottom: 1,
                 }}
               >
-                Jumlah Petugas
+                Petugas
               </Typography>
               <Typography
                 sx={{
-                  color: "#ffffff",
-                  fontSize: "28px",
+                  color: "#000000",
+                  fontSize: "40px",
                   fontWeight: 600,
                   fontFamily: "poppins",
-                  ml: 1,
+                  marginBottom: 1,
                 }}
               >
                 {petugasCount}
               </Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  fontFamily: "poppins",
+                  width: "225px",
+                }}
+              >
+                Banyak data petugas yang telah ditambahkan
+              </Typography>
             </div>
           </Grid>
           <Grid item>
             <div
               style={{
-                height: 125,
-                width: 325,
+                minHeight: 125,
+                minWidth: 225,
                 maxWidth: "100%",
                 borderRadius: "10px",
-                backgroundColor: "#E8E1D9",
-                padding: "16px",
+                backgroundColor: "#EAEFFF",
+                padding: "32px 32px 32px 32px",
               }}
             >
               <Typography
@@ -151,10 +173,10 @@ const CardStyle = (props) => {
                   fontFamily: "poppins",
                   fontSize: "20px",
                   fontWeight: "600",
-                  margin: "10px 0px 10px 10px",
+                  marginBottom: 1,
                 }}
               >
-                Jumlah Lelang
+                Lelang
               </Typography>
               <Typography
                 sx={{
@@ -164,8 +186,28 @@ const CardStyle = (props) => {
                   fontFamily: "poppins",
                   ml: 1,
                 }}
+              ></Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "40px",
+                  fontWeight: 600,
+                  fontFamily: "poppins",
+                  marginBottom: 1,
+                }}
               >
                 {lelangCount}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  fontFamily: "poppins",
+                  width: "220px",
+                }}
+              >
+                Banyak data lelang yang telah ditambahkan
               </Typography>
             </div>
           </Grid>

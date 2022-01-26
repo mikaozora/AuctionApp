@@ -26,7 +26,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  color: "#3E7C17",
+  color: "#03AC0E",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -82,7 +82,7 @@ const MainContentLelang = (props) => {
             style={{
               maxHeight: 100,
               margin: "0px 0px 8px 0px",
-              padding: 16,
+              padding: "24px",
               display: "flex",
               borderRadius: "10px",
               justifyContent: "space-between",
@@ -120,13 +120,13 @@ const MainContentLelang = (props) => {
                 variant="contained"
                 sx={{
                   textTransform: "none",
-                  backgroundColor: "#3E7C17",
+                  backgroundColor: "#03AC0E",
                   minWidth: "100px",
                   padding: 1,
                   marginLeft:1,
                   boxShadow: 'none',
                   "&:hover": {
-                    backgroundColor: '#3E7C17',
+                    backgroundColor: '#03AC0E',
                     boxShadow: 1
                   }
                 }}
