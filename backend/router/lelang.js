@@ -10,7 +10,7 @@ const { barang } = require('../models/index')
 const { history_lelang } = require('../models/index')
 const { runTime } = require('../helper/endTime')
 
-app.get("/", auth("admin", "petugas", "masyarakat"), async (req, res) => {
+app.get("/", async (req, res) => {
     await lelang.findAll({
         include:["barang"]
     })
@@ -33,6 +33,17 @@ app.get("/:id", auth("admin", "petugas", "masyarakat"), async (req, res) => {
             return response(res, 'fail', err, 'Failed get data lelang', 400)
         })
 })
+app.get("/masyarakat/:id", auth("admin", "petugas", "masyarakat"), async (req, res) => {
+    const param = {
+        idMasyarakat: req.params.id
+    }
+    await lelang.findAll({ where: param })
+        .then(result => {
+            return response(res, 'success', result, 'Success get data lelang', 200)
+        }).catch(err => {
+            return response(res, 'fail', err, 'Failed get data lelang', 400)
+        })
+})
 
 //get status
 app.get("/barang/:id", auth("admin", "petugas", "masyarakat"), async (req, res) => {
@@ -47,18 +58,22 @@ app.get("/barang/:id", auth("admin", "petugas", "masyarakat"), async (req, res) 
         })
 })
 
-app.post("/", auth("admin", "petugas"),async (req, res) => {
+app.post("/", auth("petugas"),async (req, res) => {
     const date = new Date(Date.now())
     const idBarang = {
         id: req.body.idBarang
     }
     const resultBarang = await barang.findOne({ where: idBarang })
+    const resultLelang = await lelang.findOne({where: {idBarang: req.body.idBarang}})
     const data = {
         idBarang: req.body.idBarang,
         tglLelang: toIsoString(date),
         hargaAkhir: resultBarang.dataValues.hargaAwal,
         idPetugas: req.body.idPetugas,
         status: req.body.status
+    }
+    if(resultLelang){
+        return response(res, 'fail', '', 'Barang sudah dilelang', 401)
     }
     if (data.status === lelangStatus.DIBUKA) {
         let end = new Date(req.body.endTime)
@@ -84,19 +99,17 @@ app.post("/", auth("admin", "petugas"),async (req, res) => {
     }
 })
 
-app.put("/", auth("admin", "petugas"), async (req, res) => {
+app.put("/", auth("petugas"), async (req, res) => {
     const date = new Date(Date.now())
     const idBarang = {
         id: req.body.idBarang
     }
-    const resultBarang = await barang.findOne({ where: idBarang })
     const param = {
         id: req.body.id
     }
     const data = {
         idBarang: req.body.idBarang,
         tglLelang: toIsoString(date),
-        hargaAkhir: resultBarang.dataValues.hargaAwal,
         idPetugas: req.body.idPetugas,
         status: req.body.status
     }
@@ -135,10 +148,10 @@ app.post("/bid", auth("masyarakat"),async (req, res) => {
         penawaranHarga: req.body.penawaranHarga
     }
     if (status === lelangStatus.DITUTUP) {
-        return response(res, 'fail', '', 'Status is closed', 400)
+        return response(res, 'fail', '', 'Status is closed', 402)
     }
     if (data.penawaranHarga <= hargaAkhir) {
-        return response(res, 'fail', '', 'bid must be higher', 400)
+        return response(res, 'fail', '', 'bid must be higher', 401)
     }
     await history_lelang.create(data)
     await lelang.update({ hargaAkhir: data.penawaranHarga, idMasyarakat: data.idMasyarakat }, { where: idLelang })

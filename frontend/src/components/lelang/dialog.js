@@ -25,6 +25,15 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { url } from "../../config";
 import format from "date-fns/format";
+import { styled } from "@mui/styles";
+
+const RequiredType = styled("Typography")(({ theme }) => ({
+  fontFamily: "poppins",
+  fontSize: "14px",
+  fontWeight: 300,
+  color: "#FF5C86",
+}));
+
 const theme = createTheme({
   palette: {
     success: {
@@ -39,10 +48,15 @@ const DialogAdd = (props) => {
     message: null,
     vertical: "top",
     horizpntal: "center",
+    severity: ""
   });
   const [dataBarang, setDataBarang] = useState([]);
   const [status, setStatus] = useState("");
   const [value, setValue] = useState(new Date());
+  const [required, setRequired] = useState({
+    show: false,
+    message: "",
+  });
   const headerConfig = () => {
     let header = {
       headers: {
@@ -78,20 +92,22 @@ const DialogAdd = (props) => {
         newValues,
         headerConfig()
       );
-      console.log(response);
-      if (!response) {
-        setAlert({ open: true, message: "Gagal Menambah Data Lelang" });
-      }
       props.processAdd();
-      setAlert({ open: true, message: "Berhasil Menambah Data Lelang" });
+      setAlert({ open: true, message: "Berhasil menambah data lelang", severity: "success" });
       setStatus(false);
       resetForm();
     } catch (err) {
-      console.log(err);
+      if(err.response.data.code === 401){
+        setAlert({ open: true, message: "Barang sudah dilelang", severity: "error" });
+        resetForm();
+      }else{
+        setAlert({ open: true, message: "Gagal menambah data lelang", severity: "error" });
+        resetForm();
+      }
     }
   };
   const validation = yup.object({
-    idBarang: yup.string().required("ID barang is required"),
+    idBarang: yup.string().required("Barang is required"),
     status: yup.string().required("status is required"),
     endTime: yup.string().default("-").required("endTime is required"),
   });
@@ -106,7 +122,6 @@ const DialogAdd = (props) => {
     validationSchema: validation,
     onSubmit: (values, { resetForm }) => {
       add(values, resetForm);
-      console.log(values);
     },
   });
   useEffect(() => {
@@ -117,13 +132,13 @@ const DialogAdd = (props) => {
       <div>
         <Snackbar
           open={alert.open}
-          autoHideDuration={1000}
+          autoHideDuration={5000}
           onClose={handleClose}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleClose}
-            severity="success"
+            severity={alert.severity}
             sx={{ width: "100%" }}
           >
             {alert.message}
@@ -160,6 +175,12 @@ const DialogAdd = (props) => {
                   />
                 )}
               />
+              {(formik.touched.idBarang && Boolean(formik.errors.idBarang)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.idBarang && formik.errors.idBarang}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 0 }}>
               <FormControl
@@ -183,6 +204,12 @@ const DialogAdd = (props) => {
                   <MenuItem value="Ditutup">Ditutup</MenuItem>
                 </Select>
               </FormControl>
+              {(formik.touched.status && Boolean(formik.errors.status)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.status && formik.errors.status}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             {status === "Dibuka" ? (
               <DialogContent sx={{ pt: 2, pb: 0 }}>
@@ -264,11 +291,25 @@ const DialogAdd = (props) => {
 };
 
 const DialogDelete = (props) => {
-  const [alert, setAlert] = useState(false);
-  const { open, closeDialog, processDelete } = props;
+
+  const { open, closeDialog, processDelete, handleClose, alert } = props;
 
   return (
     <div>
+      <Snackbar
+          open={alert.open}
+          autoHideDuration={5000}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity={alert.severity}
+            sx={{ width: "100%" }}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
       <Dialog
         open={open}
         onClose={closeDialog}
@@ -330,17 +371,15 @@ const DialogDelete = (props) => {
 };
 
 const DialogEdit = (props) => {
-  const [alert, setAlert] = useState({
-    open: false,
-    message: null,
-    vertical: "top",
-    horizpntal: "center",
-  });
+  const {alert, handleClose} = props
   const [open, setOpen] = useState(false);
   const [editPass, setEditPass] = useState(false);
-  const [dataBarang, setDataBarang] = useState([]);
   const [status, setStatus] = useState(false);
   const [value, setValue] = useState(new Date());
+  const [required, setRequired] = useState({
+    show: false,
+    message: "",
+  });
   let data = props.data;
   let namaBarang = props.nama;
   const headerConfig = () => {
@@ -352,32 +391,9 @@ const DialogEdit = (props) => {
     };
     return header;
   };
-  const hanndleClose = () => {
-    setOpen(false);
-  };
-  const hanndleOpen = () => {
-    setOpen(true);
-  };
-  const handleOpenEditPass = () => {
-    setEditPass(true);
-  };
-  const handleCloseEditPass = () => {
-    setEditPass(false);
-    props.closeDialog();
-  };
-  const handleClose = () => {
-    setAlert({ ...alert, open: false });
-  };
   const edit = async (values, resetForm) => {
     props.processEdit(values);
     resetForm();
-  };
-  const getDataBarang = async () => {
-    const response = await axios.get(`${url}/barang`, headerConfig());
-    if (!response) {
-      console.log("error");
-    }
-    setDataBarang(response.data.data);
   };
   const validation = yup.object({
     idBarang: yup.string().required("ID barang is required"),
@@ -400,7 +416,6 @@ const DialogEdit = (props) => {
     },
   });
   useEffect(() => {
-    getDataBarang();
   }, []);
   return (
     <ThemeProvider theme={theme}>
@@ -413,7 +428,7 @@ const DialogEdit = (props) => {
         >
           <Alert
             onClose={handleClose}
-            severity="success"
+            severity={alert.severity}
             sx={{ width: "100%" }}
           >
             {alert.message}
@@ -464,6 +479,12 @@ const DialogEdit = (props) => {
                   <MenuItem value="Ditutup">Ditutup</MenuItem>
                 </Select>
               </FormControl>
+              {(formik.touched.status && Boolean(formik.errors.status)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.status && formik.errors.status}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             {status === "Dibuka" ? (
               <DialogContent sx={{ pt: 2, pb: 0 }}>

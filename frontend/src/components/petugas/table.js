@@ -19,7 +19,7 @@ import { url } from "../../config";
 import { DialogDelete, DialogEdit } from "./dialog";
 import { tableCellClasses } from "@mui/material/TableCell";
 
-const TableBarang = (props) => {
+const TablePetugas = (props) => {
   const [data, setData] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -65,7 +65,11 @@ const TableBarang = (props) => {
     message: null,
     vertical: "top",
     horizpntal: "center",
+    severity: "",
   });
+  const handleClose = () => {
+    setAlert({ ...alert, open: false });
+  };
   const getData = async () => {
     const response = await axios.get(`${url}/petugas`, headerConfig());
     if (!response) {
@@ -75,16 +79,26 @@ const TableBarang = (props) => {
   };
 
   const deleteData = async () => {
-    const response = await axios.delete(
-      `${url}/petugas/${itemSelected}`,
-      headerConfig()
-    );
-    if (!response) {
-      console.log("error");
-    } else if (response.data.code === 200) {
+    try {
+      const response = await axios.delete(
+        `${url}/petugas/${itemSelected}`,
+        headerConfig()
+      );
+      setAlert({
+        open: true,
+        message: "Berhasil menghapus data petugas",
+        severity: "success",
+      });
       setItemSelected("");
       handleCloseDelete();
       getData();
+    } catch (err) {
+      handleCloseDelete();
+      setAlert({
+        open: true,
+        message: "Gagal menghapus data petugas",
+        severity: "error",
+      });
     }
   };
   const editData = async (payload) => {
@@ -94,18 +108,23 @@ const TableBarang = (props) => {
         payload,
         headerConfig()
       );
-      console.log(response);
       if (response.data.code === 200 || response.data.code === 201) {
         setItemSelected("");
         handleCloseEdit();
         setAlert({
           open: true,
           message: "Berhasil Mengubah Data Petugas",
+          severity: "success"
         });
         getData();
       }
     } catch (err) {
-      console.log(err);
+      handleCloseEdit();
+      setAlert({
+        open: true,
+        message: "Gagal Mengubah Data Petugas",
+        severity: "error"
+      });
     }
   };
   useEffect(() => {
@@ -118,12 +137,16 @@ const TableBarang = (props) => {
           open={openDelete}
           closeDialog={() => handleCloseDelete()}
           processDelete={() => deleteData()}
+          alert={alert}
+          handleClose={handleClose}
         />
         <DialogEdit
           open={openEdit}
           closeDialog={() => handleCloseEdit()}
           processEdit={(payload) => editData(payload)}
           data={itemSelected}
+          alert={alert}
+          handleClose={handleClose}
         />
         <Table
           sx={{
@@ -146,70 +169,82 @@ const TableBarang = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
-              <TableRow
-                key={index}
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  "&:nth-of-type(odd)": {
-                    backgroundColor: "#f7f7f7",
-                  },
-                }}
-              >
-                {/* {console.log(row)} */}
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{row.nama}</TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell align="center">
-                  {row.level === "admin" ? (
-                    <Chip
-                      label="Admin"
+            {data
+              .filter((row) => {
+                if (props.searchText == "") {
+                  return row;
+                } else if (
+                  row.nama
+                    .toLowerCase()
+                    .includes(props.searchText.toLowerCase())
+                ) {
+                  return row;
+                }
+              })
+              .map((row, index) => (
+                <TableRow
+                  key={index}
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                    "&:nth-of-type(odd)": {
+                      backgroundColor: "#f7f7f7",
+                    },
+                  }}
+                >
+                  {/* {console.log(row)} */}
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{row.nama}</TableCell>
+                  <TableCell>{row.username}</TableCell>
+                  <TableCell align="center">
+                    {row.level === "admin" ? (
+                      <Chip
+                        label="Admin"
+                        sx={{
+                          backgroundColor: "#FBFFFB",
+                          borderRadius: "8px",
+                          width: "80px",
+                          color: "#03AC0E",
+                          fontFamily: "poppins",
+                          fontWeight: 500,
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        label="Petugas"
+                        sx={{
+                          backgroundColor: "#FFEAEF",
+                          borderRadius: "8px",
+                          width: "80px",
+                          color: "#FF5C86",
+                          fontFamily: "poppins",
+                          fontWeight: 500,
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      onClick={() => handleEditData(row)}
                       sx={{
-                        backgroundColor: "#FBFFFB",
+                        backgroundColor: "#FAFFFA",
                         borderRadius: "8px",
-                        width: "80px",
-                        color: "#03AC0E",
-                        fontFamily: "poppins",
-                        fontWeight: 500,
+                        marginRight: 1,
                       }}
-                    />
-                  ) : (
-                    <Chip
-                      label="Petugas"
+                    >
+                      <EditIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleDeleteData(row.id)}
                       sx={{
-                        backgroundColor: "#FFEAEF",
+                        backgroundColor: "#FAFFFA",
                         borderRadius: "8px",
-                        width: "80px",
-                        color: "#FF5C86",
-                        fontFamily: "poppins",
-                        fontWeight: 500,
                       }}
-                    />
-                  )}
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    onClick={() => handleEditData(row)}
-                    sx={{
-                      backgroundColor: "#FAFFFA",
-                      borderRadius: "8px",
-                      marginRight: 1,
-                    }}
-                  >
-                    <EditIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDeleteData(row.id)}
-                    sx={{
-                      backgroundColor: "#FAFFFA",
-                      borderRadius: "8px"
-                    }}
-                  >
-                    <DeleteIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+                    >
+                      <DeleteIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -217,4 +252,4 @@ const TableBarang = (props) => {
   );
 };
 
-export default TableBarang;
+export default TablePetugas;

@@ -25,6 +25,14 @@ import { useFormik } from "formik";
 import { url } from "../../config";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { styled } from "@mui/styles";
+
+const RequiredType = styled("Typography")(({ theme }) => ({
+  fontFamily: "poppins",
+  fontSize: "14px",
+  fontWeight: 300,
+  color: "#FF5C86",
+}));
 
 const theme = createTheme({
   palette: {
@@ -39,9 +47,14 @@ const DialogAdd = (props) => {
     message: null,
     vertical: "top",
     horizpntal: "center",
+    severity: ""
   });
   const [level, setLevel] = useState();
   const [showPassword, setShowPassword] = useState(false);
+  const [required, setRequired] = useState({
+    show: false,
+    message: "",
+  });
   const headerConfig = () => {
     let header = {
       headers: {
@@ -70,14 +83,17 @@ const DialogAdd = (props) => {
         headerConfig()
       );
       console.log(response);
-      if (!response) {
-        setAlert({ open: true, message: "Gagal Menambah Petugas" });
-      }
       props.processAdd();
-      setAlert({ open: true, message: "Berhasil Menambah Petugas" });
+      setAlert({ open: true, message: "Berhasil Menambah Petugas", severity: "success" });
       resetForm();
     } catch (err) {
-      console.log(err);
+      if(err.response.data.code === 402){
+        console.log(err.response);
+        setAlert({ open: true, message: "Username already exist!", severity: "error" });
+      }else{
+        setAlert({ open: true, message: "Gagal Menambah Petugas", severity: "error" });
+      }
+      
     }
   };
   const validation = yup.object({
@@ -104,13 +120,13 @@ const DialogAdd = (props) => {
       <div>
         <Snackbar
           open={alert.open}
-          autoHideDuration={1000}
+          autoHideDuration={5000}
           onClose={handleClose}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleClose}
-            severity="success"
+            severity={alert.severity}
             sx={{ width: "100%" }}
           >
             {alert.message}
@@ -139,6 +155,12 @@ const DialogAdd = (props) => {
                 value={formik.values.nama}
                 autoComplete="off"
               />
+              {(formik.touched.nama && Boolean(formik.errors.nama)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.nama && formik.errors.nama}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <TextField
@@ -159,6 +181,12 @@ const DialogAdd = (props) => {
                 value={formik.values.username}
                 autoComplete="off"
               />
+              {(formik.touched.username && Boolean(formik.errors.username)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.username && formik.errors.username}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <FormControl
@@ -193,6 +221,12 @@ const DialogAdd = (props) => {
                   label="Password"
                 />
               </FormControl>
+              {(formik.touched.password && Boolean(formik.errors.password)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.password && formik.errors.password}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 0 }}>
               <FormControl
@@ -214,6 +248,12 @@ const DialogAdd = (props) => {
                   <MenuItem value="petugas">Petugas</MenuItem>
                 </Select>
               </FormControl>
+              {(formik.touched.level && Boolean(formik.errors.level)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.level && formik.errors.level}
+                </RequiredType>
+              ) : null}
             </DialogContent>
 
             <DialogActions>
@@ -267,11 +307,24 @@ const DialogAdd = (props) => {
 };
 
 const DialogDelete = (props) => {
-  const [alert, setAlert] = useState(false);
-  const { open, closeDialog, processDelete } = props;
+  const { open, closeDialog, processDelete, alert, handleClose } = props;
 
   return (
     <div>
+      <Snackbar
+          open={alert.open}
+          autoHideDuration={5000}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity={alert.severity}
+            sx={{ width: "100%" }}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
       <Dialog
         open={open}
         onClose={closeDialog}
@@ -335,15 +388,14 @@ const DialogDelete = (props) => {
 };
 
 const DialogEdit = (props) => {
-  const [alert, setAlert] = useState({
-    open: false,
-    message: null,
-    vertical: "top",
-    horizpntal: "center",
-  });
+  const {alert, handleClose} = props
   const [open, setOpen] = useState(false);
   const [editPass, setEditPass] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [required, setRequired] = useState({
+    show: false,
+    message: "",
+  });
   let data = props.data;
   const hanndleClose = () => {
     setOpen(false);
@@ -360,9 +412,6 @@ const DialogEdit = (props) => {
   };
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
-  };
-  const handleClose = () => {
-    setAlert({ ...alert, open: false });
   };
   const edit = async (values, resetForm) => {
     props.processEdit(values);
@@ -392,13 +441,13 @@ const DialogEdit = (props) => {
       <div>
         <Snackbar
           open={alert.open}
-          autoHideDuration={1000}
+          autoHideDuration={5000}
           onClose={handleClose}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleClose}
-            severity="success"
+            severity={alert.severity}
             sx={{ width: "100%" }}
           >
             {alert.message}
@@ -427,6 +476,12 @@ const DialogEdit = (props) => {
                 value={formik.values.nama}
                 autoComplete="off"
               />
+              {(formik.touched.nama && Boolean(formik.errors.nama)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.nama && formik.errors.nama}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <TextField
@@ -471,43 +526,43 @@ const DialogEdit = (props) => {
                 </Select>
               </FormControl>
             </DialogContent>
-
-            <DialogContent sx={{ pt: 0, pb: 2 }}>
-              <FormControl
-                sx={{ mt: 1, width: "100%", backgroundColor: "#f7f7f7" }}
-                variant="outlined"
-                color="success"
-              >
-                <InputLabel htmlFor="outlined-adornment-password">
-                  Password
-                </InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formik.values.password ? formik.values.password : ""}
-                  onChange={formik.handleChange}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleShowPassword}
-                        edge="end"
-                      >
-                        {showPassword ? (
-                          <VisibilityOffIcon />
-                        ) : (
-                          <VisibilityIcon />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Password"
-                  disabled={editPass ? false : true}
-                />
-              </FormControl>
-            </DialogContent>
-
+            {editPass ? (
+              <DialogContent sx={{ pt: 0, pb: 2 }}>
+                <FormControl
+                  sx={{ mt: 1, width: "100%", backgroundColor: "#f7f7f7" }}
+                  variant="outlined"
+                  color="success"
+                >
+                  <InputLabel htmlFor="outlined-adornment-password">
+                    Password
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formik.values.password ? formik.values.password : ""}
+                    onChange={formik.handleChange}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <VisibilityOffIcon />
+                          ) : (
+                            <VisibilityIcon />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label="Password"
+                    disabled={editPass ? false : true}
+                  />
+                </FormControl>
+              </DialogContent>
+            ) : null}
             <DialogActions>
               <Button onClick={() => handleOpenEditPass()} color="success">
                 Edit Password

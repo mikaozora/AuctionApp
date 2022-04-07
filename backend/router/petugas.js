@@ -42,7 +42,7 @@ app.post("/", auth("admin"),async (req, res) => {
     const resultMasyarakat = await masyarakat.findOne({ where: param })
     const resultPetugas = await petugas.findOne({ where: param })
     if (resultMasyarakat || resultPetugas) {
-        return response(res, 'fail', '', 'Username Already exist', 400)
+        return response(res, 'fail', '', 'Username Already exist', 402)
     } else {
         data.username = param.username
         await petugas.create(data)

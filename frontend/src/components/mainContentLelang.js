@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import TableBarang from "./lelang/table";
+import TableLelang from "./lelang/table";
 import { styled } from "@mui/material/styles";
 import { InputBase, Button, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterButton from "./lelang/filter";
 import AddIcon from "@mui/icons-material/Add";
-import {DialogAdd} from "./lelang/dialog";
+import { DialogAdd } from "./lelang/dialog";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -47,75 +47,85 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const MainContentLelang = (props) => {
-    const [openDialog, setOpenDialog] = React.useState(false);
-    const [reloadAll, setReloadAll] = useState(false)
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [reloadAll, setReloadAll] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [sortedBy, setSortedBy] = useState("");
 
-    const handleClickOpen = () => {
-      setOpenDialog(true);
-    };
-  
-    const handleClose = () => {
-      setOpenDialog(false);
-    };
-    const handleReload = () => {
-      setReloadAll(true);
-      setTimeout(() => {
-        setReloadAll(false);
-      }, 500);
-    };
-    return (
-      <main
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+  const handleReload = () => {
+    setReloadAll(true);
+    setTimeout(() => {
+      setReloadAll(false);
+    }, 500);
+  };
+  const handleSorted = (value) => {
+    setSortedBy(value);
+  };
+  return (
+    <main
+      style={{
+        background: "#f7f7f7f7",
+        minHeight: "100vh",
+        flexGrow: 1,
+        overflow: "auto",
+      }}
+    >
+      <DialogAdd
+        open={openDialog}
+        closeDialog={() => handleClose()}
+        processAdd={() => handleReload()}
+      />
+      <div
         style={{
-          background: "#f7f7f7f7",
-          minHeight: "100vh",
-          flexGrow: 1,
-          overflow: "auto",
+          padding: 80,
         }}
       >
-        <DialogAdd open={openDialog} closeDialog={() => handleClose()} processAdd={() => handleReload()} />
         <div
           style={{
-            padding: 80,
+            maxHeight: 100,
+            margin: "0px 0px 8px 0px",
+            padding: "24px",
+            display: "flex",
+            borderRadius: "10px",
+            justifyContent: "space-between",
+            backgroundColor: "#ffffff",
+            alignItems: "center",
           }}
         >
           <div
             style={{
-              maxHeight: 100,
-              margin: "0px 0px 8px 0px",
-              padding: "24px",
-              display: "flex",
-              borderRadius: "10px",
-              justifyContent: "space-between",
-              backgroundColor: "#ffffff",
               alignItems: "center",
             }}
           >
-            <div
+            <h3
               style={{
-                alignItems: "center",
+                margin: 0,
+                fontFamily: "poppins",
               }}
             >
-              <h3
-                style={{
-                  margin: 0,
-                  fontFamily: "poppins",
-                }}
-              >
-                Data Lelang
-              </h3>
-            </div>
-            <div style={{ display: "flex" }}>
-              
-              <FilterButton />
-              <Search>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search…"
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
+              Data Lelang
+            </h3>
+          </div>
+          <div style={{ display: "flex" }}>
+            <FilterButton sortedBy={handleSorted} />
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Search>
+            {localStorage.getItem("role") === "petugas" ? (
               <Button
                 variant="contained"
                 sx={{
@@ -123,25 +133,37 @@ const MainContentLelang = (props) => {
                   backgroundColor: "#03AC0E",
                   minWidth: "100px",
                   padding: 1,
-                  marginLeft:1,
-                  boxShadow: 'none',
+                  marginLeft: 1,
+                  boxShadow: "none",
                   "&:hover": {
-                    backgroundColor: '#03AC0E',
-                    boxShadow: 1
-                  }
+                    backgroundColor: "#03AC0E",
+                    boxShadow: 1,
+                  },
                 }}
                 onClick={() => handleClickOpen()}
               >
                 <AddIcon />
-                <Typography sx={{ fontFamily: "poppins", fontSize: "14px", marginLeft:1, fontWeight:200 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "poppins",
+                    fontSize: "14px",
+                    marginLeft: 1,
+                    fontWeight: 200,
+                  }}
+                >
                   Create
                 </Typography>
               </Button>
-            </div>
+            ) : null}
           </div>
-          <TableBarang reload={reloadAll} />
         </div>
-      </main>
-    );
-  }
+        <TableLelang
+          reload={reloadAll}
+          searchText={searchText}
+          sortedBy={sortedBy}
+        />
+      </div>
+    </main>
+  );
+};
 export default MainContentLelang;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TableBarang from "./barang/table";
 import { styled } from "@mui/material/styles";
 import { InputBase, Button, Typography } from "@mui/material";
@@ -6,6 +6,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterButton from "./barang/filter";
 import AddIcon from "@mui/icons-material/Add";
 import {DialogAdd} from "./barang/dialog";
+import axios from "axios";
+import { url } from "../config";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -49,7 +51,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const MainContentBarang = (props) => {
     const [openDialog, setOpenDialog] = React.useState(false);
     const [reloadAll, setReloadAll] = useState(false)
-
+    const [searchText, setSearchText] = useState('')
+    const [sortedBy, setSortedBy] = useState("")
+    const headerConfig = () => {
+      let header = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      return header;
+    };
     const handleClickOpen = () => {
       setOpenDialog(true);
     };
@@ -63,6 +75,11 @@ const MainContentBarang = (props) => {
         setReloadAll(false);
       }, 500);
     };
+    const handleSorted = (value) => {
+      setSortedBy(value)
+    }
+    useEffect(() => {
+    }, [reloadAll])
     return (
       <main
         style={{
@@ -105,8 +122,7 @@ const MainContentBarang = (props) => {
               </h3>
             </div>
             <div style={{ display: "flex" }}>
-              
-              <FilterButton />
+              <FilterButton sortedBy={handleSorted} />
               <Search>
                 <SearchIconWrapper>
                   <SearchIcon />
@@ -114,6 +130,7 @@ const MainContentBarang = (props) => {
                 <StyledInputBase
                   placeholder="Search…"
                   inputProps={{ "aria-label": "search" }}
+                  onChange={e => {setSearchText(e.target.value)}}
                 />
               </Search>
               <Button
@@ -139,7 +156,7 @@ const MainContentBarang = (props) => {
               </Button>
             </div>
           </div>
-          <TableBarang reload={reloadAll} />
+          <TableBarang reload={reloadAll} searchText={searchText} sortedBy={sortedBy} />
         </div>
       </main>
     );

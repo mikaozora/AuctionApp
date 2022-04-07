@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -20,12 +20,13 @@ import { DialogDelete, DialogEdit } from "./dialog";
 import { tableCellClasses } from "@mui/material/TableCell";
 import { convertToRupiah } from "../../helper/convertRupiah";
 
-const TableBarang = (props) => {
+const TableLelang = (props) => {
   const [data, setData] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [itemSelected, setItemSelected] = useState("");
   const [nameBarang, setNameBarang] = useState("");
+  const role = localStorage.getItem("role")
 
   const handleClickOpenDelete = () => {
     setOpenDelete(true);
@@ -60,26 +61,60 @@ const TableBarang = (props) => {
     message: null,
     vertical: "top",
     horizpntal: "center",
+    severity: "",
   });
-  const getData = async () => {
-    const response = await axios.get(`${url}/lelang`, headerConfig());
-    if (!response) {
-      console.log("error");
-    }
-    setData(response.data.data);
+  const handleClose = () => {
+    setAlert({ ...alert, open: false });
   };
+  const sorted = (data, sortedBy) => {
+    let result = [];
+    if (sortedBy == "name") {
+      result = data.sort((a, b) =>
+        a.barang.nama.toLowerCase() > b.barang.nama.toLowerCase() ? 1 : -1
+      );
+    } else if (sortedBy == "date") {
+      result = data.sort(
+        (a, b) => new Date(b.tglLelang) - new Date(a.tglLelang)
+      );
+    } else if (sortedBy == "price") {
+      result = data.sort(
+        (a, b) => parseFloat(b.hargaAkhir) - parseFloat(a.hargaAkhir)
+      );
+    } else {
+      result = data;
+    }
+    return result;
+  };
+  const getData = useCallback(async () => {
+    try {
+      const response = await axios.get(`${url}/lelang`, headerConfig());
+      if (response.data.data) {
+        let sortedData = sorted(response.data.data, props.sortedBy);
+        setData(sortedData);
+      }
+      setData(response.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [props.sortedBy]);
 
   const deleteData = async () => {
-    const response = await axios.delete(
-      `${url}/lelang/${itemSelected}`,
-      headerConfig()
-    );
-    if (!response) {
-      console.log("error");
-    } else if (response.data.code === 200) {
+    try {
+      const response = await axios.delete(
+        `${url}/lelang/${itemSelected}`,
+        headerConfig()
+      );
+      setAlert({
+        open: true,
+        message: "Berhasil menghapus data lelang",
+        severity: "success",
+      });
       setItemSelected("");
       handleCloseDelete();
       getData();
+    } catch (err) {
+      console.log(err.response);
+      setAlert({ open: true, message: "Gagal menghapus data lelang", severity: "error" });
     }
   };
   const editData = async (payload) => {
@@ -93,22 +128,25 @@ const TableBarang = (props) => {
         newValues,
         headerConfig()
       );
-      if (response.data.code === 200 || response.data.code === 201) {
         setItemSelected("");
         handleCloseEdit();
         setAlert({
           open: true,
-          message: "Berhasil Mengubah Data Petugas",
+          message: "Berhasil mengubah data lelang",
+          severity: "success",
         });
         getData();
-      }
     } catch (err) {
-      console.log(err);
+      setAlert({
+        open: true,
+        message: "Gagal mengubah data lelang",
+        severity: "error",
+      });
     }
   };
   useEffect(() => {
     getData();
-  }, [props.reload]);
+  }, [getData, props.reload]);
   return (
     <Paper sx={{ boxShadow: "none", padding: 3, borderRadius: 1 }}>
       <TableContainer>
@@ -116,6 +154,8 @@ const TableBarang = (props) => {
           open={openDelete}
           closeDialog={() => handleCloseDelete()}
           processDelete={() => deleteData()}
+          handleClose={handleClose}
+          alert={alert}
         />
         <DialogEdit
           open={openEdit}
@@ -123,6 +163,8 @@ const TableBarang = (props) => {
           processEdit={(payload) => editData(payload)}
           data={itemSelected}
           nama={nameBarang}
+          alert={alert}
+          handleClose={handleClose}
         />
         <Table
           sx={{
@@ -143,77 +185,93 @@ const TableBarang = (props) => {
               <TableCell align="left">Tanggal Lelang</TableCell>
               <TableCell align="left">Tanggal Berakhir</TableCell>
               <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Action</TableCell>
+              {role === "petugas" ? <TableCell align="center">Action</TableCell> : null}
+              
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
-              <TableRow
-                key={index}
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  "&:nth-of-type(odd)": {
-                    backgroundColor: "#f7f7f7",
-                  },
-                }}
-              >
-                <TableCell>{index + 1}</TableCell>
-                <TableCell align="left">{row.barang.nama}</TableCell>
-                <TableCell align="left">{convertToRupiah(row.hargaAkhir)}</TableCell>
-                <TableCell align="left">{row.tglLelang}</TableCell>
-                <TableCell align="left">
-                  {row.endTime ? row.endTime : "-"}
-                </TableCell>
-                <TableCell align="center">
-                  {row.status === "Dibuka" ? (
-                    <Chip
-                      label="Dibuka"
+            {data
+              .filter((row) => {
+                if (props.searchText == "") {
+                  return row;
+                } else if (
+                  row.barang.nama
+                    .toLowerCase()
+                    .includes(props.searchText.toLowerCase())
+                ) {
+                  return row;
+                }
+              })
+              .map((row, index) => (
+                <TableRow
+                  key={index}
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                    "&:nth-of-type(odd)": {
+                      backgroundColor: "#f7f7f7",
+                    },
+                  }}
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell align="left">{row.barang.nama}</TableCell>
+                  <TableCell align="left">
+                    {convertToRupiah(row.hargaAkhir)}
+                  </TableCell>
+                  <TableCell align="left">{row.tglLelang}</TableCell>
+                  <TableCell align="left">
+                    {row.endTime ? row.endTime : "-"}
+                  </TableCell>
+                  <TableCell align="center">
+                    {row.status === "Dibuka" ? (
+                      <Chip
+                        label="Dibuka"
+                        sx={{
+                          backgroundColor: "#FBFFFB",
+                          borderRadius: "8px",
+                          width: "80px",
+                          color: "#03AC0E",
+                          fontFamily: "poppins",
+                          fontWeight: 500,
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        label="Ditutup"
+                        sx={{
+                          backgroundColor: "#FFEAEF",
+                          borderRadius: "8px",
+                          width: "80px",
+                          color: "#FF5C86",
+                          fontFamily: "poppins",
+                          fontWeight: 500,
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  {role === "petugas" ? <TableCell align="center">
+                    <IconButton
+                      onClick={() => handleEditData(row)}
                       sx={{
-                        backgroundColor: "#FBFFFB",
+                        backgroundColor: "#FAFFFA",
                         borderRadius: "8px",
-                        width: "80px",
-                        color: "#03AC0E",
-                        fontFamily: "poppins",
-                        fontWeight: 500,
+                        marginRight: 1,
                       }}
-                    />
-                  ) : (
-                    <Chip
-                      label="Ditutup"
+                    >
+                      <EditIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleDeleteData(row.id)}
                       sx={{
-                        backgroundColor: "#FFEAEF",
+                        backgroundColor: "#FAFFFA",
                         borderRadius: "8px",
-                        width: "80px",
-                        color: "#FF5C86",
-                        fontFamily: "poppins",
-                        fontWeight: 500,
                       }}
-                    />
-                  )}
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    onClick={() => handleEditData(row)}
-                    sx={{
-                      backgroundColor: "#FAFFFA",
-                      borderRadius: "8px",
-                      marginRight: 1,
-                    }}
-                  >
-                    <EditIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDeleteData(row.id)}
-                    sx={{
-                      backgroundColor: "#FAFFFA",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <DeleteIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+                    >
+                      <DeleteIcon sx={{ fontSize: "16px", color: "#03AC0E" }} />
+                    </IconButton>
+                  </TableCell> : null}
+                  
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -221,4 +279,4 @@ const TableBarang = (props) => {
   );
 };
 
-export default TableBarang;
+export default TableLelang;

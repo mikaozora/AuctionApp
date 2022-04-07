@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TableBarang from "./petugas/table";
+import TablePetugas from "./petugas/table";
 import { styled } from "@mui/material/styles";
 import { InputBase, Button, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -49,6 +49,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const MainContentPetugas = (props) => {
     const [openDialog, setOpenDialog] = React.useState(false);
     const [reloadAll, setReloadAll] = useState(false)
+    const [searchText, setSearchText] = useState('')
 
     const handleClickOpen = () => {
       setOpenDialog(true);
@@ -114,6 +115,7 @@ const MainContentPetugas = (props) => {
                 <StyledInputBase
                   placeholder="Search…"
                   inputProps={{ "aria-label": "search" }}
+                  onChange={e => setSearchText(e.target.value)}
                 />
               </Search>
               <Button
@@ -139,7 +141,7 @@ const MainContentPetugas = (props) => {
               </Button>
             </div>
           </div>
-          <TableBarang reload={reloadAll} />
+          <TablePetugas reload={reloadAll} searchText={searchText} />
         </div>
       </main>
     );

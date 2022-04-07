@@ -3,15 +3,19 @@ import { Button, MenuItem, Menu, Typography } from "@mui/material";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
-const FilterButton = () => {
+const FilterButton = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleSort = (value) => {
+    props.sortedBy(value)
     setAnchorEl(null);
   };
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
   return (
     <div>
       <Button
@@ -37,7 +41,7 @@ const FilterButton = () => {
             marginLeft: 1,
           }}
         >
-          Filter
+          Sort
         </Typography>
       </Button>
       <Menu
@@ -59,21 +63,27 @@ const FilterButton = () => {
       >
         <MenuItem
           sx={{ fontFamily: "poppins", fontSize: "14px" }}
-          onClick={handleClose}
+          onClick={() => handleSort("date")}
         >
           By Date
         </MenuItem>
         <MenuItem
           sx={{ fontFamily: "poppins", fontSize: "14px" }}
-          onClick={handleClose}
+          onClick={() => handleSort("name")}
         >
           By Name
         </MenuItem>
         <MenuItem
           sx={{ fontFamily: "poppins", fontSize: "14px" }}
-          onClick={handleClose}
+          onClick={() => handleSort("price")}
         >
-          By Level
+          By Price
+        </MenuItem>
+        <MenuItem
+          sx={{ fontFamily: "poppins", fontSize: "14px" }}
+          onClick={() => handleSort("")}
+        >
+          Default
         </MenuItem>
       </Menu>
     </div>

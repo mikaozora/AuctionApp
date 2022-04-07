@@ -76,7 +76,7 @@ app.put("/", auth("masyarakat"), async (req, res) => {
             payload.username = data.username
             await masyarakat.update(payload, { where: param })
                 .then(result => {
-                    return response(res, 'fail', result, 'Success update data masyarakat', 200)
+                    return response(res, 'sucess', result, 'Success update data masyarakat', 200)
                 })
                 .catch(err => {
                     return response(res, 'fail', err, 'Failed update data masyarakat', 400)

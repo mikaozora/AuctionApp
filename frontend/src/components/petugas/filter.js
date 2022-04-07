@@ -37,7 +37,7 @@ const FilterButton = () => {
             marginLeft: 1,
           }}
         >
-          Filter
+          Sort
         </Typography>
       </Button>
       <Menu

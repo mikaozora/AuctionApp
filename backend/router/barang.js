@@ -9,6 +9,7 @@ const auth = require('../auth')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 const { barang } = require('../models/index')
+const { lelang } = require('../models/index')
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, "./barangImage")

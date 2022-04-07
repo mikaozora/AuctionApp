@@ -11,11 +11,25 @@ import {
   Alert,
   createTheme,
   ThemeProvider,
+  IconButton,
+  Typography,
+  CardMedia,
 } from "@mui/material";
 import axios from "axios";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { url } from "../../config";
+import { styled } from "@mui/styles";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import {splitter} from "../../helper/splitter"
+import { toIsoString } from "../../helper/date";
+
+const RequiredType = styled("Typography")(({ theme }) => ({
+  fontFamily: "poppins",
+  fontSize: "14px",
+  fontWeight: 300,
+  color: "#FF5C86",
+}));
 
 const theme = createTheme({
   palette: {
@@ -31,6 +45,11 @@ const DialogAdd = (props) => {
     message: null,
     vertical: "top",
     horizpntal: "center",
+    severity: "",
+  });
+  const [required, setRequired] = useState({
+    show: false,
+    message: "",
   });
   const headerConfig = () => {
     let header = {
@@ -41,9 +60,6 @@ const DialogAdd = (props) => {
     };
     return header;
   };
-  // const handleClick = (newState) => () => {
-  //   setSnack({ open: true, ...newState });
-  // };
 
   const handleClose = () => {
     setAlert({ ...alert, open: false });
@@ -61,14 +77,19 @@ const DialogAdd = (props) => {
         headerConfig()
       );
       console.log(response);
-      if (!response) {
-        setAlert({ open: true, message: "Gagal Menambah Barang" });
-      }
       props.processAdd();
-      setAlert({ open: true, message: "Berhasil Menambah Barang" });
+      setAlert({
+        open: true,
+        message: "Berhasil Menambah Barang",
+        severity: "success",
+      });
       resetForm();
     } catch (err) {
-      console.log(err);
+      setAlert({
+        open: true,
+        message: "Gagal Menambah Barang",
+        severity: "error",
+      });
     }
   };
   const validation = yup.object({
@@ -96,13 +117,13 @@ const DialogAdd = (props) => {
       <div>
         <Snackbar
           open={alert.open}
-          autoHideDuration={1000}
+          autoHideDuration={5000}
           onClose={handleClose}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleClose}
-            severity="success"
+            severity={alert.severity}
             sx={{ width: "100%" }}
           >
             {alert.message}
@@ -131,7 +152,14 @@ const DialogAdd = (props) => {
                 value={formik.values.nama}
                 autoComplete="off"
               />
+              {(formik.touched.nama && Boolean(formik.errors.nama)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.nama && formik.errors.nama}
+                </RequiredType>
+              ) : null}
             </DialogContent>
+
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <TextField
                 margin="dense"
@@ -151,6 +179,12 @@ const DialogAdd = (props) => {
                 value={formik.values.hargaAwal}
                 autoComplete="off"
               />
+              {(formik.touched.hargaAwal && Boolean(formik.errors.hargaAwal)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.hargaAwal && formik.errors.hargaAwal}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <TextField
@@ -173,28 +207,13 @@ const DialogAdd = (props) => {
                 value={formik.values.deskripsi}
                 autoComplete="off"
               />
+              {(formik.touched.deskripsi && Boolean(formik.errors.deskripsi)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.deskripsi && formik.errors.deskripsi}
+                </RequiredType>
+              ) : null}
             </DialogContent>
-            {/* <DialogContent sx={{ pt: 0, pb: 2 }}>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="image"
-              label="image"
-              type="file"
-              fullWidth
-              variant="outlined"
-              color="success"
-              sx={{
-                minWidth: "500px",
-                outline: "none",
-                backgroundColor: "#f7f7f7",
-              }}
-              name="image"
-              onChange={formik.handleChange}
-              values={formik.values.image}
-              autoComplete="off"
-            />
-          </DialogContent> */}
             <DialogContent sx={{ pt: 0, pb: 0 }}>
               <TextField
                 margin="dense"
@@ -214,36 +233,12 @@ const DialogAdd = (props) => {
                 }}
                 autoComplete="off"
               />
-
-              {/* <Button variant="contained" component="label">
-              Upload Image
-              <input
-                type="file"
-                hidden
-                onChange={formik.handleChange}
-                values={formik.values.image}
-              />
-            </Button> */}
-              {/* <input
-              accept="image/*"
-              className="contained-flie"
-              style={{ display: "none" }}
-              id="raised-button-file"
-              multiple
-              type="file"
-            />
-            <label htmlFor="raised-button-file">
-              <Button
-                variant="contained"
-                component="span"
-                className="button-image"
-              >
-                {formik.values.image == "" && "Upload File"}
-                {console.log(formik.values.image)}
-                {typeof formik.values.image === "object" &&
-                  formik.values.image.name}
-              </Button>
-            </label> */}
+              {(formik.touched.image && Boolean(formik.errors.image)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.image && formik.errors.image}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogActions>
               <Button
@@ -296,11 +291,24 @@ const DialogAdd = (props) => {
 };
 
 const DialogDelete = (props) => {
-  const [alert, setAlert] = useState(false);
-  const { open, closeDialog, processDelete } = props;
+  const { open, closeDialog, processDelete, handleClose, alert } = props;
 
   return (
     <div>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={5000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
       <Dialog
         open={open}
         onClose={closeDialog}
@@ -308,7 +316,7 @@ const DialogDelete = (props) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">{"Hapus Data Barang"}</DialogTitle>
-        <DialogContent sx={{pb:1}}>
+        <DialogContent sx={{ pb: 1 }}>
           <DialogContentText id="alert-dialog-description">
             Apakah anda yakin ingin menghapus data barang?
           </DialogContentText>
@@ -362,16 +370,12 @@ const DialogDelete = (props) => {
 };
 
 const DialogEdit = (props) => {
-  const [alert, setAlert] = useState({
-    open: false,
-    message: null,
-    vertical: "top",
-    horizpntal: "center",
+  const { alert, handleClose } = props;
+  const [required, setRequired] = useState({
+    show: false,
+    message: "",
   });
   let data = props.data;
-  const handleClose = () => {
-    setAlert({ ...alert, open: false });
-  };
   const edit = async (values) => {
     const formData = new FormData();
     formData.append("id", values.id);
@@ -409,13 +413,13 @@ const DialogEdit = (props) => {
       <div>
         <Snackbar
           open={alert.open}
-          autoHideDuration={1000}
+          autoHideDuration={5000}
           onClose={handleClose}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <Alert
             onClose={handleClose}
-            severity="success"
+            severity={alert.severity}
             sx={{ width: "100%" }}
           >
             {alert.message}
@@ -444,6 +448,12 @@ const DialogEdit = (props) => {
                 value={formik.values.nama}
                 autoComplete="off"
               />
+              {(formik.touched.nama && Boolean(formik.errors.nama)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.nama && formik.errors.nama}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <TextField
@@ -464,6 +474,12 @@ const DialogEdit = (props) => {
                 value={formik.values.hargaAwal}
                 autoComplete="off"
               />
+              {(formik.touched.hargaAwal && Boolean(formik.errors.hargaAwal)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.hargaAwal && formik.errors.hargaAwal}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogContent sx={{ pt: 0, pb: 2 }}>
               <TextField
@@ -486,28 +502,13 @@ const DialogEdit = (props) => {
                 value={formik.values.deskripsi}
                 autoComplete="off"
               />
+              {(formik.touched.deskripsi && Boolean(formik.errors.deskripsi)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.deskripsi && formik.errors.deskripsi}
+                </RequiredType>
+              ) : null}
             </DialogContent>
-            {/* <DialogContent sx={{ pt: 0, pb: 2 }}>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="image"
-              label="image"
-              type="file"
-              fullWidth
-              variant="outlined"
-              color="success"
-              sx={{
-                minWidth: "500px",
-                outline: "none",
-                backgroundColor: "#f7f7f7",
-              }}
-              name="image"
-              onChange={formik.handleChange}
-              values={formik.values.image}
-              autoComplete="off"
-            />
-          </DialogContent> */}
             <DialogContent sx={{ pt: 0, pb: 0 }}>
               <TextField
                 margin="dense"
@@ -527,36 +528,12 @@ const DialogEdit = (props) => {
                 }}
                 autoComplete="off"
               />
-
-              {/* <Button variant="contained" component="label">
-              Upload Image
-              <input
-                type="file"
-                hidden
-                onChange={formik.handleChange}
-                values={formik.values.image}
-              />
-            </Button> */}
-              {/* <input
-              accept="image/*"
-              className="contained-flie"
-              style={{ display: "none" }}
-              id="raised-button-file"
-              multiple
-              type="file"
-            />
-            <label htmlFor="raised-button-file">
-              <Button
-                variant="contained"
-                component="span"
-                className="button-image"
-              >
-                {formik.values.image == "" && "Upload File"}
-                {console.log(formik.values.image)}
-                {typeof formik.values.image === "object" &&
-                  formik.values.image.name}
-              </Button>
-            </label> */}
+              {(formik.touched.image && Boolean(formik.errors.image)) ||
+              required.show ? (
+                <RequiredType>
+                  {formik.touched.image && formik.errors.image}
+                </RequiredType>
+              ) : null}
             </DialogContent>
             <DialogActions>
               <Button
@@ -608,4 +585,73 @@ const DialogEdit = (props) => {
   );
 };
 
-export { DialogAdd, DialogDelete, DialogEdit };
+const DialogDetail = (props) => {
+  const { processEdit } = props;
+  let data = props.data;
+
+  return (
+    <div>
+      <Dialog
+        open={props.open}
+        onClose={props.closeDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth="true"
+        maxWidth="md"
+      >
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle id="alert-dialog-title">{"Detail Barang"}</DialogTitle>
+          <IconButton
+            onClick={props.closeDialog}
+            sx={{ "&:hover": { backgroundColor: "#ffffff" } }}
+          >
+            <CloseRoundedIcon sx={{ marginRight: 2 }} />
+          </IconButton>
+        </div>
+        <DialogContent sx={{ pt: 1 }}>
+          <div style={{ display: "flex" }}>
+            <CardMedia
+              
+              component="img"
+              height="300"
+              sx={{ width: 300 }}
+              image={url + "/barang_image/" + data.image}
+            />
+            <div>
+              <table style={{ margin: "8px", width: "100%", padding: "8px", fontFamily: "poppins", paddingRight: "16px" }}>
+                <tr align="left">
+                  <th>Nama Barang</th>
+                  <th>Tanggal</th>
+                </tr>
+                <tr>
+                  <td>{data.nama}</td>
+                  <td>{data.tgl}</td>
+                </tr>
+                <tr align="left" style={{marginTop: "8px"}}>
+                  <th>Harga Awal</th>
+                  <th>UpdatedAt</th>
+                </tr>
+                <tr>
+                  <td>{data.hargaAwal}</td>
+                  <td>{splitter(toIsoString(new Date(data.updatedAt)))}</td>
+                </tr>
+                <tr align="left">
+                  <th style={{}} colSpan="2">
+                    Deskripsi
+                  </th>
+                </tr>
+                <tr>
+                  <td style={{ }} colSpan="2">
+                    {data.deskripsi}
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export { DialogAdd, DialogDelete, DialogEdit, DialogDetail };

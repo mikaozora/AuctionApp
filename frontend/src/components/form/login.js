@@ -39,6 +39,14 @@ const InputStyle = styled("input")(({ theme }) => ({
   },
 }));
 
+const RequiredType = styled("Typography")(({ theme }) => ({
+  marginLeft: "40px",
+  fontFamily: "poppins",
+  fontSize: "14px",
+  fontWeight: 400,
+  color: "#FF5C86",
+}));
+
 const theme = createTheme({
   palette: {
     success: {
@@ -94,11 +102,18 @@ const Login = (props) => {
         localStorage.setItem("userLogin", JSON.stringify(user));
         localStorage.setItem("token", token);
         localStorage.setItem("role", response.data.data.level);
-        return history.push("/dashboard");
-        setRequired({
-          show: false,
-          message: "",
-        });
+        let role = localStorage.getItem("role");
+        console.log(role === "masyarakat");
+        if (role === "admin" || role === "petugas") {
+          return history.push("/dashboard");
+        } else if (role === "masyarakat") {
+          return history.push("/");
+        }
+
+        // setRequired({
+        //   show: false,
+        //   message: "",
+        // });
       }
     } catch (err) {
       console.log(err);
@@ -192,13 +207,13 @@ const Login = (props) => {
                   },
                 }}
               />
-              {(formik.touched.username && Boolean(formik.errors.username)) ||
-              required.show ? (
-                <Typography>
-                  {formik.touched.username && formik.errors.username}
-                </Typography>
-              ) : null}
             </FormControl>
+            {(formik.touched.username && Boolean(formik.errors.username)) ||
+            required.show ? (
+              <RequiredType>
+                {formik.touched.username && formik.errors.username}
+              </RequiredType>
+            ) : null}
 
             <Typography
               sx={{
@@ -257,6 +272,12 @@ const Login = (props) => {
                 }
               />
             </FormControl>
+            {(formik.touched.password && Boolean(formik.errors.password)) ||
+            required.show ? (
+              <RequiredType>
+                {formik.touched.password && formik.errors.password}
+              </RequiredType>
+            ) : null}
             <Button
               variant="contained"
               type="submit"
